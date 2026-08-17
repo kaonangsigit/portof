@@ -5,16 +5,7 @@
   "framework": "nextjs",
   "outputDirectory": ".next",
   "regions": ["iad1"],
-  "env": {
-    "GITHUB_TOKEN": "@github_token",
-    "GITHUB_USERNAME": "@github_username"
-  },
-  "build": {
-    "env": {
-      "GITHUB_TOKEN": "@github_token",
-      "GITHUB_USERNAME": "@github_username"
-    }
-  },
+
   "headers": [
     {
       "source": "/(.*)",
