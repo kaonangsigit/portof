@@ -1,0 +1,14 @@
+{
+  "name": "John Doe",
+  "title": "Full Stack Developer",
+  "email": "john.doe@example.com",
+  "phone": "+1 234 567 8900",
+  "bio": "Passionate full-stack developer with 5+ years of experience building modern web applications. Specialized in React, Node.js, and cloud technologies.",
+  "availability": "Available for hire",
+  "location": "San Francisco, CA",
+  "socialLinks": {
+    "github": "https://github.com/yourusername",
+    "linkedin": "https://linkedin.com/in/yourusername",
+    "twitter": "https://twitter.com/yourusername"
+  }
+}

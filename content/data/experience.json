@@ -1,0 +1,28 @@
+[
+  {
+    "company": "Tech Company Inc.",
+    "position": "Senior Full Stack Developer",
+    "startDate": "2022-01",
+    "endDate": null,
+    "description": "Lead developer for customer-facing web applications serving 100k+ users",
+    "technologies": ["React", "Node.js", "PostgreSQL", "AWS"],
+    "achievements": [
+      "Reduced page load time by 60% through optimization",
+      "Implemented CI/CD pipeline reducing deployment time by 80%",
+      "Mentored 3 junior developers"
+    ]
+  },
+  {
+    "company": "StartUp Co.",
+    "position": "Full Stack Developer",
+    "startDate": "2020-03",
+    "endDate": "2021-12",
+    "description": "Built scalable web applications from scratch",
+    "technologies": ["Vue.js", "Express", "MongoDB", "Docker"],
+    "achievements": [
+      "Developed MVP in 3 months",
+      "Grew user base to 10k+ users",
+      "Implemented real-time features using WebSockets"
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+# Docker ignore file
+# Prevent unnecessary files from being copied to Docker image for security and performance
+
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build artifacts
+.next
+out
+build
+dist
+
+# Build/log/cache artifacts (enhance performance)
+logs
+*.log
+tmp
+temp
+.cache
+coverage
+.nyc_output
+.pnpm-store
+*.swp
+*.swo
+*~
+
+# Environment files (security - .env files should not be committed)
+.env
+.env.local
+.env*
+*.env*
+
+# Git files (source control)
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab-ci.yml
+
+# Documentation (keep README.md but exclude other .md files)
+*.md
+!README.md
+
+# IDE configurations
+.vscode
+.idea
+.editorconfig
+.prettierrc
+.prettierignore
+.eslintrc.json
+.eslintignore
+
+# Executable scripts (not needed in container)
+scripts
+*.sh
+*.bat
+*.ps1
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CI/CD files
+.github/**
+.gitlab-ci.yml
+
+# Temporary development files
+tmp/
+temp/
+logs/
+
+# Additional system files
+*.pyc
+__pycache__/
+*.so
+*.dylib
+
+# Cypress test artifacts
+cypress/screenshots
+cypress/videos
+

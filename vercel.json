@@ -1,0 +1,44 @@
+# Vercel Configuration
+# https://vercel.com/docs/configuration
+
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "regions": ["iad1"],
+  "env": {
+    "GITHUB_TOKEN": "@github_token",
+    "GITHUB_USERNAME": "@github_username"
+  },
+  "build": {
+    "env": {
+      "GITHUB_TOKEN": "@github_token",
+      "GITHUB_USERNAME": "@github_username"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
+  "rewrites": [],
+  "redirects": [],
+  "cleanUrls": true,
+  "trailingSlash": false
+}

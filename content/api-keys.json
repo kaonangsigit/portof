@@ -1,0 +1,12 @@
+[
+  {
+    "id": "github_token",
+    "ciphertext": "Xt54JYJO9mjk08I7NgXUyUcG1X3NKzC3QMgODp7hSPJMUbLgJbjR/dq+KMhRj0sbxm+FUDaEMIqxQhaVye2/GowvuHy/9c8hNxOOa6fm8T0eeoKOfhPfWS3/LgHD3j/zVPZWKIzVnFwQHhKsiQ==",
+    "iv": "+ss+vnsz7NwHrbYmKZseUA=="
+  },
+  {
+    "id": "gemini_api_key",
+    "ciphertext": "HGlJWlQWs6X3sLyZsFazC8Xmg8T3h/HrolfV1ckkozKtuJXUmG48bqtgDCnRkinoXc/+eo/YtqHQsrvVWVG/SwBow3A3",
+    "iv": "e1ugzfrHexTemgcRoiqwQw=="
+  }
+]

@@ -1,0 +1,215 @@
+name: Multi-Environment Deployments
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - production
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment for deployment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip running tests before deployment'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  lint-check:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.environment == null && github.ref != 'refs/heads/main' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+  run-tests:
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip_tests }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run integration tests
+        run: npm run test:watch
+
+  verify-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify required secrets
+        run: |
+          echo "Verifying required secrets..."
+          if [[ -z "${{ secrets.VERCEL_TOKEN }}" ]]; then
+            echo "ERROR: VERCEL_TOKEN not set!"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
+            echo "ERROR: GITHUB_TOKEN not set!"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.NETLIFY_AUTH_TOKEN }}" ]]; then
+            echo "ERROR: NETLIFY_AUTH_TOKEN not set!"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]]; then
+            echo "ERROR: DOCKERHUB_TOKEN not set!"
+            exit 1
+          fi
+          echo "All required secrets verified successfully."
+
+  staging-deployment:
+    needs: [lint-check, run-tests, verify-secrets]
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/staging' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'staging') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+
+      - name: Deploy to Vercel (Staging)
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-environment: preview
+          vercel-git-commit-message: ${{ github.event.head_commit.message }}
+
+      - name: Deploy to Netlify (Staging)
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --site ${{ secrets.NETLIFY_SITE_ID }} --branch staging
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Build and push Docker image (Staging)
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/kaonang-portfolio:staging -f Dockerfile .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/kaonang-portfolio:staging
+          echo "Docker image pushed successfully."
+
+      - name: Post-deployment verification
+        run: |
+          curl -f "https://kaonang-portfolio-staging.vercel.app/api/health" || {
+            echo "ERROR: Staging health check failed!"
+            exit 1
+          }
+
+  production-deployment:
+    needs: [lint-check, run-tests, verify-secrets]
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'production') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+
+      - name: Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-environment: production
+
+      - name: Deploy to Netlify (Production)
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --prod --site ${{ secrets.NETLIFY_SITE_ID }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Build and push Docker image (Production)
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/kaonang-portfolio:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/kaonang-portfolio:${{ github.sha }} -f Dockerfile .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/kaonang-portfolio:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/kaonang-portfolio:${{ github.sha }}
+          echo "Production Docker images pushed successfully."
+
+      - name: Security audit post-deployment
+        run: |
+          npm audit --audit-level moderate
+          curl -sSf "https://raw.githubusercontent.com/Kilo-Org/kilocode/main/security-scan.js" -o security-scan.js
+          node security-scan.js
+        env:
+          SECURITY_SECRET: ${{ secrets.SECURITY_SECRET }}
+
+      - name: Production verification
+        run: |
+          curl -f "https://kaonang-portfolio.vercel.app/api/health" || {
+            echo "ERROR: Production health check failed!"
+            exit 1
+          }

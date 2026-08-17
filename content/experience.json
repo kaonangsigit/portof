@@ -1,0 +1,16 @@
+[
+  {
+    "id": "exp-1784550976223",
+    "company": "Bpom",
+    "role": "STAFF",
+    "period": "2023",
+    "description": "TEST",
+    "achievements": [
+      "TEST"
+    ],
+    "technologies": [
+      "PYTHON"
+    ],
+    "current": false
+  }
+]

@@ -1,0 +1,94 @@
+# Docker Compose configuration for Next.js Portfolio Development
+# Built with Docker best practices and GitHub Authentication support
+
+version: '3.8'
+
+x-next-app: &next-app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  env_file:
+    - ./.env.local
+  environment:
+    NODE_ENV: development
+    PORT: 3000
+  volumes:
+    # Mount code for live updates
+    - ./:/app
+    # Skip node_modules volume to use host's version
+    - /app/node_modules
+    # Mount logs for debugging
+    - ./logs:/app/logs
+
+services:
+  # Next.js development server
+  frontend:
+    <<: *next-app
+    image: portfolio-frontend-dev
+    # Port mapping for local testing
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Node.js inspector port
+    # Health check for container status
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Development environment (auto-restarts on code change)
+    restart: unless-stopped
+
+  # GitHub API service for testing auth configuration
+  github-api:
+    image: alpine:3.19
+    container_name: portfolio-github-api-test
+    command: |
+      sh -c '
+        apk add --no-cache curl git
+        echo "Testing GitHub API connectivity..."
+        if [ -z "$GITHUB_TOKEN" ]; then
+          echo "ERROR: GITHUB_TOKEN not set!"
+          exit 1
+        fi
+        echo "Token found (masked): ${GITHUB_TOKEN:0:4}..."
+        echo "Testing rate limit endpoint..."
+        curl -H "Authorization: token $GITHUB_TOKEN" \
+             -H "Accept: application/vnd.github.v3+json" \
+             "https://api.github.com/user" \
+             -o /dev/null \
+             -w "%{http_code}"
+      '
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_USERNAME=${GITHUB_USERNAME}
+    # GitHub auth setup support
+    profiles:
+      - setup
+
+  # Logging service for development
+  logger:
+    image: alpine:3.19
+    container_name: portfolio-logger
+    command: |
+      sh -c '
+        apk add --no-cache bash
+        tail -f /dev/null
+      '
+    volumes:
+      - ./logs:/logs
+    profiles:
+      - dev
+
+volumes:
+  logs:
+
+profiles:
+  default:
+    - frontend
+  dev:
+    - frontend
+    - logger
+  setup:
+    - frontend
+    - github-api

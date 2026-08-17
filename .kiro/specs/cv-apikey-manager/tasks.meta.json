@@ -1,0 +1,87 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "3.2 Buat `app/api/admin/api-keys/test/route.ts` — handler GET connection test": [
+      {
+        "executionId": "88102a41-3d20-4a2a-a856-3f0ee129b071",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784522852236
+      }
+    ],
+    "3. Implementasi API routes untuk API Key Manager": [
+      {
+        "executionId": "88102a41-3d20-4a2a-a856-3f0ee129b071",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784522852277
+      }
+    ],
+    "7.2 Buat `app/api/admin/cv-save/route.ts`": [
+      {
+        "executionId": "88102a41-3d20-4a2a-a856-3f0ee129b071",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784523068478
+      }
+    ],
+    "4.2 Implementasi logika reveal/hide, save, dan test": [
+      {
+        "executionId": "88102a41-3d20-4a2a-a856-3f0ee129b071",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784523068529
+      }
+    ],
+    "7. Implementasi API routes untuk CV Upload & Parsing": [
+      {
+        "executionId": "88102a41-3d20-4a2a-a856-3f0ee129b071",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784523068558
+      }
+    ],
+    "8.1 Buat `components/admin/CVUploader.tsx` dengan fase `upload` dan validasi file": [
+      {
+        "executionId": "88102a41-3d20-4a2a-a856-3f0ee129b071",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784523439898
+      }
+    ],
+    "8.4 Implementasi save dari CV Review Form": [
+      {
+        "executionId": "9b09b921-5900-401c-ac58-0c1eebde590a",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784524065100
+      }
+    ],
+    "8. Implementasi komponen `components/admin/CVUploader.tsx`": [
+      {
+        "executionId": "9b09b921-5900-401c-ac58-0c1eebde590a",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784524065194
+      }
+    ],
+    "9.2 Update `app/admin/page.tsx` — lazy load ApiKeyManager dan CVUploader": [
+      {
+        "executionId": "9b09b921-5900-401c-ac58-0c1eebde590a",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784524065398
+      }
+    ],
+    "9. Update `components/admin/AdminNav.tsx` dan `app/admin/page.tsx`": [
+      {
+        "executionId": "9b09b921-5900-401c-ac58-0c1eebde590a",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784524065457
+      }
+    ],
+    "10. Final checkpoint — Pastikan semua tests pass": [
+      {
+        "executionId": "9b09b921-5900-401c-ac58-0c1eebde590a",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784524072530
+      },
+      {
+        "executionId": "9b09b921-5900-401c-ac58-0c1eebde590a",
+        "chatSessionId": "sess_0a272836-8f54-4fb2-b0b7-f8b67bda0e3a",
+        "timestamp": 1784524536892
+      }
+    ]
+  }
+}

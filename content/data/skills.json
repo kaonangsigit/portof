@@ -1,0 +1,29 @@
+[
+  {
+    "category": "Frontend Development",
+    "skills": [
+      { "name": "React", "level": 95 },
+      { "name": "TypeScript", "level": 90 },
+      { "name": "Next.js", "level": 88 },
+      { "name": "Tailwind CSS", "level": 92 }
+    ]
+  },
+  {
+    "category": "Backend Development",
+    "skills": [
+      { "name": "Node.js", "level": 85 },
+      { "name": "Express", "level": 82 },
+      { "name": "PostgreSQL", "level": 80 },
+      { "name": "MongoDB", "level": 78 }
+    ]
+  },
+  {
+    "category": "DevOps & Tools",
+    "skills": [
+      { "name": "Docker", "level": 75 },
+      { "name": "AWS", "level": 70 },
+      { "name": "Git", "level": 90 },
+      { "name": "CI/CD", "level": 72 }
+    ]
+  }
+]

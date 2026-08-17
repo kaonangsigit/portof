@@ -1,0 +1,17 @@
+{
+  "name": "Kaonang Sigit Prakoso",
+  "title": "Full Stack Developer",
+  "subtitle": "Building modern web experiences",
+  "bio": "I'm a passionate Full Stack Developer with experience in building scalable web applications.",
+  "email": "kaonangp@gmail.com",
+  "location": "Indonesia",
+  "availability": "Open to opportunities",
+  "skills": [
+    "CLOUD COMPUTING"
+  ],
+  "profileImage": "/images/profile.jpeg",
+  "socialLinks": {
+    "linkedin": "https://www.linkedin.com/in/kaonang-sigit-prakoso"
+  },
+  "resumeUrl": "/resume.pdf"
+}
