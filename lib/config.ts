@@ -2,9 +2,15 @@
  * Centralised runtime configuration (reads from env vars)
  */
 
+const getValidUrl = (url: string | undefined): string => {
+  if (!url) return "https://kaonang.dev";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `https://${url}`;
+};
+
 export const siteConfig = {
   name: process.env.NEXT_PUBLIC_SITE_NAME ?? "Portfolio",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://kaonang.dev",
+  url: getValidUrl(process.env.NEXT_PUBLIC_SITE_URL),
   description:
     "Full Stack Developer specializing in React, Next.js, and Node.js",
 
