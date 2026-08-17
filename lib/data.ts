@@ -3,17 +3,22 @@
  */
 
 export const siteMetadata = {
-  title: "Kaonang Sigit Prakoso - Full Stack Developer",
+  title: "Kaonang Sigit Prakoso — QA Engineer & Backend Developer | Portfolio",
   description:
-    "Full Stack Developer specializing in React, Next.js, and Node.js. Explore my projects, skills, and experience.",
+    "QA Engineer and Backend Developer with 2+ years experience. Validated 200+ regulatory documents, analyzed 1000+ data records, tested 50+ APIs. View projects on GitHub.",
   keywords: [
-    "Full Stack Developer",
-    "React",
-    "Next.js",
-    "TypeScript",
+    "QA Engineer",
+    "Backend Developer",
+    "Software Testing",
+    "REST API",
     "Node.js",
-    "Web Developer",
+    "Data Analyst",
+    "Full Stack Developer",
+    "Python",
+    "Laravel",
+    "Cloud Computing",
     "Portfolio",
+    "Indonesia"
   ],
   author: "Kaonang Sigit Prakoso",
   siteUrl: (() => {

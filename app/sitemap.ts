@@ -1,47 +1,45 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kaonangsigitprakoso.my.id";
   const currentDate = new Date().toISOString();
 
   return [
     {
       url: baseUrl,
       lastModified: currentDate,
-      changeFrequency: "monthly",
+      changeFrequency: "weekly",
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/about`,
+      url: `${baseUrl}#about`,
+      lastModified: currentDate,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}#projects`,
+      lastModified: currentDate,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}#experience`,
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/projects`,
+      url: `${baseUrl}#skills`,
       lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.9,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
-      url: `${baseUrl}/blog`,
-      lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}#contact`,
       lastModified: currentDate,
       changeFrequency: "yearly",
-      priority: 0.6,
+      priority: 0.7,
     },
-    // Add dynamic routes here
-    // Example: blog posts
-    // ...blogPosts.map((post) => ({
-    //   url: `${baseUrl}/blog/${post.slug}`,
-    //   lastModified: post.updatedAt,
-    //   changeFrequency: 'monthly' as const,
-    //   priority: 0.6,
-    // })),
   ];
 }
