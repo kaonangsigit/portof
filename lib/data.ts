@@ -16,8 +16,11 @@ export const siteMetadata = {
     "Portfolio",
   ],
   author: "Kaonang Sigit Prakoso",
-  siteUrl:
-    process.env.NEXT_PUBLIC_SITE_URL || "https://kaonang.dev",
+  siteUrl: (() => {
+    const url = process.env.NEXT_PUBLIC_SITE_URL || "https://kaonang.dev";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+  })(),
   locale: "en_US",
   twitterHandle: "@kaonangsigit",
 };
