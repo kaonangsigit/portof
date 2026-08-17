@@ -9,6 +9,14 @@ const inter = Inter({
   display: "block",
 });
 
+const getSiteUrl = () => {
+  const url = siteMetadata.siteUrl;
+  if (!url || !url.startsWith('http')) {
+    return 'https://kaonang.dev';
+  }
+  return url;
+};
+
 export const metadata: Metadata = {
   title: siteMetadata.title,
   description: siteMetadata.description,
@@ -19,7 +27,7 @@ export const metadata: Metadata = {
     locale: siteMetadata.locale,
     title: siteMetadata.title,
     description: siteMetadata.description,
-    url: siteMetadata.siteUrl,
+    url: getSiteUrl(),
   },
   twitter: {
     card: "summary_large_image",
@@ -30,7 +38,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  metadataBase: new URL(siteMetadata.siteUrl),
+  metadataBase: new URL(getSiteUrl()),
 };
 
 export default function RootLayout({

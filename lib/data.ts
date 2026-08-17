@@ -17,7 +17,7 @@ export const siteMetadata = {
   ],
   author: "Kaonang Sigit Prakoso",
   siteUrl:
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    process.env.NEXT_PUBLIC_SITE_URL || "https://kaonang.dev",
   locale: "en_US",
   twitterHandle: "@kaonangsigit",
 };
