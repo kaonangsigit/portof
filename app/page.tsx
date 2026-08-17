@@ -1,7 +1,8 @@
-import Hero from "@/components/Hero";
+import HeroRedesigned from "@/components/HeroRedesigned";
 import About from "@/components/About";
 import Experience from "@/components/Experience";
 import Education from "@/components/Education";
+import ProjectsRedesigned from "@/components/ProjectsRedesigned";
 import GitHubSection from "@/components/github/GitHubSection";
 import Achievements from "@/components/Achievements";
 import Stats from "@/components/Stats";
@@ -17,10 +18,11 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Navigation />
-      <Hero />
+      <HeroRedesigned />
       <About />
       <Stats />
       <Experience />
+      <ProjectsRedesigned />
       <Education />
       <GitHubSection />
       <Certificates />

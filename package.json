@@ -16,6 +16,7 @@
     "@octokit/rest": "^22.0.1",
     "@react-three/drei": "^9.0.0",
     "@react-three/fiber": "^8.0.0",
+    "framer-motion": "^13.1.0",
     "gray-matter": "^4.0.3",
     "marked": "^11.2.0",
     "mongodb": "^7.5.0",

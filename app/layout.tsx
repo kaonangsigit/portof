@@ -57,7 +57,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     }
   },
-  canonical: siteUrl,
   alternates: {
     canonical: siteUrl,
   }
