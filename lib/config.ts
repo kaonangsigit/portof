@@ -4,7 +4,7 @@
 
 export const siteConfig = {
   name: process.env.NEXT_PUBLIC_SITE_NAME ?? "Portfolio",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://kaonang.dev",
   description:
     "Full Stack Developer specializing in React, Next.js, and Node.js",
 

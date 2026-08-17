@@ -130,7 +130,7 @@ export const EMAIL_TEMPLATES = {
  */
 export const ENV_CONFIG = {
   DEVELOPMENT: {
-    API_URL: "http://localhost:3000",
+    API_URL: "https://kaonang.dev",
     API_TIMEOUT: TIMEOUTS.DEFAULT,
     ENABLE_ANALYTICS: false,
     ENABLE_CACHING: true,
