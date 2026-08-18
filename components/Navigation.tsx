@@ -60,8 +60,7 @@ export default function Navigation() {
             onClick={(e) => { e.preventDefault(); handleNavClick("#home"); }}
             className="text-xl font-bold text-blue-600 dark:text-blue-400 hover:opacity-80 transition-opacity"
           >
-            {personalInfo.name.split(" ")[0]}
-            <span className="text-gray-900 dark:text-white">.</span>
+            {personalInfo.name}
           </a>
 
           {/* Desktop nav */}

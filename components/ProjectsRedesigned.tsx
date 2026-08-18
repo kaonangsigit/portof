@@ -18,19 +18,33 @@ interface Project {
 
 const ALL = "All";
 
+const GITHUB_USERNAME = "kaonangsigit";
+
 export default function ProjectsRedesigned() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(ALL);
 
   useEffect(() => {
-    fetch("/api/content-public?type=projects")
-      .then((res) => res.json())
-      .then((data) => {
-        setProjects(Array.isArray(data) ? data : []);
+    const fetchProjects = async () => {
+      try {
+        // Fetch dari local JSON dulu
+        const res = await fetch("/api/content-public?type=projects");
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        } else {
+          // Fallback ke hardcoded projects jika JSON kosong
+          setProjects(getDefaultProjects());
+        }
+      } catch {
+        setProjects(getDefaultProjects());
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   const categories = [ALL, ...new Set(projects.map((p) => p.category))];
@@ -129,7 +143,7 @@ export default function ProjectsRedesigned() {
         {/* CTA */}
         <div className="text-center mt-16">
           <a
-            href="https://github.com/kaonangsigit"
+            href={`https://github.com/${GITHUB_USERNAME}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
@@ -148,4 +162,69 @@ export default function ProjectsRedesigned() {
       </div>
     </section>
   );
+}
+
+function getDefaultProjects(): Project[] {
+  return [
+    {
+      id: 1,
+      title: "SKIN-AJA",
+      description: "ML-powered skin disease detection API with backend integration and GCP deployment",
+      technologies: ["Node.js", "Express.js", "Firebase", "GCP", "REST API"],
+      githubUrl: "https://github.com/kaonangsigit/skin-aja",
+      liveUrl: null,
+      featured: true,
+      category: "Backend"
+    },
+    {
+      id: 2,
+      title: "BPOM Data Automation",
+      description: "Python automation application for pharmaceutical import/export data validation",
+      technologies: ["Python", "Data Analysis", "Excel", "Automation"],
+      githubUrl: "https://github.com/kaonangsigit/bpom-automation",
+      liveUrl: null,
+      featured: false,
+      category: "Data Analysis"
+    },
+    {
+      id: 3,
+      title: "Kelurahan Rejosari Website",
+      description: "Laravel-based public service website with admin dashboard and automated services",
+      technologies: ["Laravel", "PHP", "MySQL", "Bootstrap"],
+      githubUrl: "https://github.com/kaonangsigit/kelurahan-rejosari",
+      liveUrl: null,
+      featured: false,
+      category: "Full Stack"
+    },
+    {
+      id: 4,
+      title: "E-Commerce Keripik Tempe",
+      description: "Full-stack e-commerce platform for UMKM tempe chips business",
+      technologies: ["PHP", "MySQL", "JavaScript", "CSS"],
+      githubUrl: "https://github.com/kaonangsigit/keripik-tempe-ecommerce",
+      liveUrl: null,
+      featured: false,
+      category: "Full Stack"
+    },
+    {
+      id: 5,
+      title: "KaonangStore React",
+      description: "Modern React-based digital product catalog with responsive design",
+      technologies: ["React.js", "JavaScript", "CSS", "Responsive"],
+      githubUrl: "https://github.com/kaonangsigit/kaonangstore-react",
+      liveUrl: null,
+      featured: false,
+      category: "Frontend"
+    },
+    {
+      id: 6,
+      title: "Poliklinik Management System",
+      description: "PHP-based clinic management system with patient and doctor database",
+      technologies: ["PHP", "MySQL", "HTML", "CSS"],
+      githubUrl: "https://github.com/kaonangsigit/poliklinik-php",
+      liveUrl: null,
+      featured: false,
+      category: "Backend"
+    }
+  ];
 }
