@@ -2,7 +2,6 @@ import HeroRedesigned from "@/components/HeroRedesigned";
 import About from "@/components/About";
 import Experience from "@/components/Experience";
 import Education from "@/components/Education";
-import ProjectsRedesigned from "@/components/ProjectsRedesigned";
 import GitHubSection from "@/components/github/GitHubSection";
 import Achievements from "@/components/Achievements";
 import Stats from "@/components/Stats";
@@ -22,7 +21,6 @@ export default function Home() {
       <About />
       <Stats />
       <Experience />
-      <ProjectsRedesigned />
       <Education />
       <GitHubSection />
       <Certificates />
