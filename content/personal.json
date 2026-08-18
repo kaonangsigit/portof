@@ -1,16 +1,14 @@
 {
   "name": "Kaonang Sigit Prakoso",
-  "title": "Full Stack Developer",
-  "subtitle": "Building modern web experiences",
-  "bio": "I'm a passionate Full Stack Developer with experience in building scalable web applications.",
+  "title": "QA Engineer & Backend Developer",
+  "subtitle": "Quality Assurance • API Development • Data Analysis",
+  "bio": "QA Engineer and Backend Developer with 2+ years of professional experience in software testing, REST API development, and data analysis. Validated 200+ regulatory documents, analyzed 1000+ data records, and tested 50+ APIs across cloud infrastructure.",
   "email": "kaonangp@gmail.com",
   "location": "Indonesia",
   "availability": "Open to opportunities",
-  "skills": [
-    "CLOUD COMPUTING"
-  ],
   "profileImage": "/images/profile.jpeg",
   "socialLinks": {
+    "github": "https://github.com/kaonangsigit",
     "linkedin": "https://www.linkedin.com/in/kaonang-sigit-prakoso"
   },
   "resumeUrl": "/resume.pdf"

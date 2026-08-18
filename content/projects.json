@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "SKIN-AJA",
+    "description": "ML-powered skin disease detection API with backend integration and GCP deployment",
+    "longDescription": "Bangkit Academy capstone project. Developed 6-10 REST API endpoints using Node.js, Express.js, and Firebase. Integrated backend with ML model and mobile application. Deployed complete system on Google Cloud Platform with full testing coverage.",
+    "technologies": ["Node.js", "Express.js", "Firebase", "GCP", "REST API", "API Testing", "Integration Testing"],
+    "githubUrl": "https://github.com/kaonangsigit/skin-aja",
+    "liveUrl": null,
+    "image": "/projects/skin-aja.jpg",
+    "featured": true,
+    "category": "Backend"
+  },
+  {
+    "id": 2,
+    "title": "BPOM Data Automation",
+    "description": "Python automation application for pharmaceutical import/export data validation",
+    "longDescription": "Developed Python application to automate data validation and comparison for 1000+ import/export records. Replaced manual process with automated system, improving speed and accuracy. Integrated with Excel for data processing and reporting.",
+    "technologies": ["Python", "Data Analysis", "Excel", "Automation", "Data Validation"],
+    "githubUrl": "https://github.com/kaonangsigit/bpom-automation",
+    "liveUrl": null,
+    "image": "/projects/bpom-automation.jpg",
+    "featured": false,
+    "category": "Data Analysis"
+  },
+  {
+    "id": 3,
+    "title": "Kelurahan Rejosari Website",
+    "description": "Laravel-based public service website with admin dashboard and automated services",
+    "longDescription": "Full-stack development for Semarang kelurahan (village) website. Built using Laravel MVC framework with MySQL database. Features include news management, letter service automation, budget visualization, and public information dissemination. Implemented comprehensive testing across all features.",
+    "technologies": ["Laravel", "PHP", "MySQL", "JavaScript", "Bootstrap", "Functional Testing"],
+    "githubUrl": "https://github.com/kaonangsigit/kelurahan-rejosari",
+    "liveUrl": null,
+    "image": "/projects/kelurahan-rejosari.jpg",
+    "featured": false,
+    "category": "Full Stack"
+  },
+  {
+    "id": 4,
+    "title": "E-Commerce Keripik Tempe UMKM",
+    "description": "Full-stack e-commerce platform for UMKM tempe chips business",
+    "longDescription": "End-to-end e-commerce solution for local UMKM business. Features product catalog, inventory management, shopping cart, order processing, and basic payment integration. Designed to help small business reach online market.",
+    "technologies": ["HTML", "CSS", "JavaScript", "PHP", "MySQL", "E-commerce"],
+    "githubUrl": "https://github.com/kaonangsigit/keripik-tempe-ecommerce",
+    "liveUrl": null,
+    "image": "/projects/keripik-tempe.jpg",
+    "featured": false,
+    "category": "Full Stack"
+  },
+  {
+    "id": 5,
+    "title": "KaonangStore React",
+    "description": "Modern React-based digital product catalog with responsive design",
+    "longDescription": "Modern frontend application built with React.js for showcasing digital products. Implements responsive design patterns, component-based architecture, and smooth user interactions. Demonstrates proficiency in contemporary frontend frameworks.",
+    "technologies": ["React.js", "JavaScript", "CSS", "Responsive Design"],
+    "githubUrl": "https://github.com/kaonangsigit/kaonangstore-react",
+    "liveUrl": null,
+    "image": "/projects/kaonangstore.jpg",
+    "featured": false,
+    "category": "Frontend"
+  },
+  {
+    "id": 6,
+    "title": "Poliklinik Management System",
+    "description": "PHP-based clinic management system with patient and doctor database",
+    "longDescription": "Full-featured clinic management system built with PHP and MySQL. Includes patient record management, doctor scheduling, appointment system, and medical records. Demonstrates database design, system architecture, and comprehensive feature implementation.",
+    "technologies": ["PHP", "MySQL", "HTML", "CSS", "Database Design", "System Architecture"],
+    "githubUrl": "https://github.com/kaonangsigit/poliklinik-php",
+    "liveUrl": null,
+    "image": "/projects/poliklinik.jpg",
+    "featured": false,
+    "category": "Backend"
+  }
+]

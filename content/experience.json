@@ -1,16 +1,50 @@
 [
   {
-    "id": "exp-1784550976223",
-    "company": "Bpom",
-    "role": "STAFF",
-    "period": "2023",
-    "description": "TEST",
+    "id": "exp-bpom",
+    "company": "BPOM RI",
+    "role": "QA & Data Analyst Internship",
+    "period": "Nov 2025 - May 2026",
+    "description": "Quality assurance and data analysis for pharmaceutical import/export monitoring. Validated regulatory documents and automated data validation processes.",
     "achievements": [
-      "TEST"
+      "Verified and validated 200+ import documents for drug, narcotic, and precursor materials",
+      "Analyzed 1000+ SKI and CPP data records using Python and Excel",
+      "Developed Python automation application for data validation and comparison",
+      "Digitized and archived 500+ approval documents into digital system",
+      "Performed system testing on KMEI subsite with 10+ bug findings"
     ],
-    "technologies": [
-      "PYTHON"
+    "technologies": ["Python", "Excel", "Data Validation", "System Testing", "API Integration"],
+    "current": false
+  },
+  {
+    "id": "exp-bangkit",
+    "company": "Bangkit Academy (Google, Tokopedia, Gojek, Traveloka)",
+    "role": "Cloud Computing Backend Developer",
+    "period": "Feb 2024 - Nov 2024",
+    "description": "Intensive 900-hour program in cloud computing, backend development, and system deployment. Developed APIs and integrated ML services with cloud infrastructure.",
+    "achievements": [
+      "Developed 6-10 REST API endpoints using Node.js, Express.js, and Firebase",
+      "Deployed and integrated systems using Google Cloud Platform",
+      "Collaborated in cross-functional team (6 members) using Agile methodology",
+      "Performed API testing, functional testing, integration testing, and UAT",
+      "Successfully completed and presented SKIN-AJA capstone project"
     ],
+    "technologies": ["Node.js", "Express.js", "Firebase", "GCP", "REST API", "Testing"],
+    "current": false
+  },
+  {
+    "id": "exp-diskominfo",
+    "company": "DISKOMINFO Semarang",
+    "role": "Web Developer Internship",
+    "period": "Jun 2024 - Nov 2024",
+    "description": "Full-stack web development for public service website. Built features for service management and information dissemination.",
+    "achievements": [
+      "Developed website rebranding using Laravel framework with MVC architecture",
+      "Built 8+ features including letter service automation, budget visualization, and content management",
+      "Implemented automated letter generation system in PDF format",
+      "Designed and implemented centralized admin dashboard with MySQL database",
+      "Performed functional testing and debugging on 10+ system features"
+    ],
+    "technologies": ["Laravel", "PHP", "MySQL", "JavaScript", "Bootstrap", "Testing"],
     "current": false
   }
 ]
