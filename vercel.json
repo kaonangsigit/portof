@@ -7,31 +7,26 @@
   "regions": ["iad1"],
   "env": {
     "NEXT_PUBLIC_SITE_URL": "https://kaonangsigitprakoso.my.id",
-    "GITHUB_USERNAME": "@GITHUB_USERNAME"
+    "NEXT_PUBLIC_GITHUB_USERNAME": "kaonangsigit",
+    "NEXT_PUBLIC_GITHUB_URL": "https://github.com/kaonangsigit",
+    "NEXT_PUBLIC_SITE_NAME": "Kaonang Sigit Prakoso"
   },
   "build": {
     "env": {
       "NEXT_PUBLIC_SITE_URL": "https://kaonangsigitprakoso.my.id",
-      "GITHUB_USERNAME": "@GITHUB_USERNAME"
+      "NEXT_PUBLIC_GITHUB_USERNAME": "kaonangsigit",
+      "NEXT_PUBLIC_GITHUB_URL": "https://github.com/kaonangsigit",
+      "NEXT_PUBLIC_SITE_NAME": "Kaonang Sigit Prakoso"
     }
   },
-
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection",       "value": "1; mode=block" },
+        { "key": "Referrer-Policy",         "value": "strict-origin-when-cross-origin" }
       ]
     }
   ],
