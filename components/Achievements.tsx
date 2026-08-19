@@ -1,93 +1,61 @@
 "use client";
-
 import { useState, useEffect } from "react";
+import SectionWrapper from "@/components/SectionWrapper";
+import AnimatedContent from "@/components/reactbits/AnimatedContent";
+import GlareHover from "@/components/reactbits/GlareHover";
+import SpotlightCard from "@/components/reactbits/SpotlightCard";
 
 interface Achievement {
-  id: string | number;
-  title: string;
-  organization: string;
-  year: string;
-  description: string;
-  icon: string;
+  id: string | number; title: string; organization: string;
+  year: string; description: string; icon: string;
 }
 
 export default function Achievements() {
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [items, setItems] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/content-public?type=achievements")
-      .then((res) => res.json())
-      .then((data) => {
-        setAchievements(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
+      .then(r => r.json())
+      .then(d => { setItems(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <section id="achievements" className="py-20 bg-gray-50 dark:bg-gray-950">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="h-10 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-4 animate-pulse" />
-            <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded mx-auto animate-pulse" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-44 bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (loading) return (
+    <SectionWrapper id="achievements" variant="dark"
+      header={{ eyebrow: "04 / Achievements", title: "Achievements" }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {[1,2,3].map(i => <div key={i} className="card-dark h-44 rounded-xl animate-pulse" />)}
+      </div>
+    </SectionWrapper>
+  );
 
-  if (achievements.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
-    <section id="achievements" className="py-20 bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Achievements
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
-            Certifications, awards, and milestones I&apos;m proud of.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {achievements.map((item) => (
-            <article
-              key={item.id}
-              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
-            >
-              <span className="text-4xl" aria-hidden="true">
-                {item.icon}
-              </span>
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                    {item.title}
-                  </h3>
-                  <span className="text-xs text-gray-500 dark:text-gray-500 whitespace-nowrap">
-                    {item.year}
-                  </span>
+    <SectionWrapper id="achievements" variant="dark"
+      header={{ eyebrow: "04 / Achievements", title: "Achievements", subtitle: "Certifications, awards, and milestones I'm proud of." }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {items.map((item, i) => (
+          <AnimatedContent key={item.id} distance={28} direction="vertical"
+            delay={i * 0.08} duration={0.55} threshold={0.08}>
+            <GlareHover glareColor="#3b82f6" glareOpacity={0.1} glareSize={55} className="rounded-xl h-full">
+              <SpotlightCard spotlightColor="rgba(59,130,246,0.07)" spotlightSize={200}
+                className="card-dark shimmer-on-hover p-6 rounded-xl flex flex-col gap-4 h-full">
+                <span className="text-3xl">{item.icon}</span>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <h3 className="text-sm font-bold text-white">{item.title}</h3>
+                    <span className="text-xs text-gray-600 shrink-0">{item.year}</span>
+                  </div>
+                  <p className="text-xs font-semibold text-blue-400 mb-2">{item.organization}</p>
+                  <p className="text-sm text-gray-400 leading-relaxed">{item.description}</p>
                 </div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
-                  {item.organization}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{item.description}</p>
-              </div>
-            </article>
-          ))}
-        </div>
+              </SpotlightCard>
+            </GlareHover>
+          </AnimatedContent>
+        ))}
       </div>
-    </section>
+    </SectionWrapper>
   );
 }
