@@ -21,34 +21,52 @@ interface PersonalData {
   profileImage?: string;
   resumeUrl?: string;
   heroRoles?: string[];
+  techStack?: string[];
   socialLinks?: { github?: string; linkedin?: string; twitter?: string; instagram?: string };
 }
 
-const DEFAULT_ROLES = [
-  "QA Engineer",
-  "Backend Developer",
-  "API Tester",
-  "Data Analyst",
-  "Python Developer",
+interface StatItem {
+  label: string;
+  value: string;
+  icon: string;
+}
+
+// ── Static fallbacks — used when CMS has no data yet ────────────────────────
+const DEFAULT_ROLES = ["QA Engineer", "Backend Developer", "API Tester", "Data Analyst", "Python Developer"];
+
+const DEFAULT_STATS: StatItem[] = [
+  { label: "Documents Validated", value: "200+", icon: "✓"  },
+  { label: "Data Records",        value: "1000+", icon: "📊" },
+  { label: "APIs Tested",         value: "50+",  icon: "🔌" },
+  { label: "Years Experience",    value: "2+",   icon: "📅" },
 ];
 
-const STATS = [
-  { value: 200,  suffix: "+", label: "Documents Validated" },
-  { value: 1000, suffix: "+", label: "Data Records"        },
-  { value: 50,   suffix: "+", label: "APIs Tested"         },
-  { value: 2,    suffix: "+", label: "Years Experience"    },
-];
+const DEFAULT_TECH = ["Python", "FastAPI", "Selenium", "Postman", "SQL", "Docker", "REST API", "Pytest"];
 
-const TECH_STACK = ["Python", "FastAPI", "Selenium", "Postman", "SQL", "Docker", "REST API", "Pytest"];
+// ── Parse "200+" → { number: 200, suffix: "+" } ─────────────────────────────
+function parseStat(v: string) {
+  const suffix = v.match(/[^0-9]*$/)?.[0] ?? "";
+  const prefix = v.match(/^[^0-9]*/)?.[0] ?? "";
+  const number = parseFloat(v.replace(/[^0-9.]/g, "")) || 0;
+  return { number, suffix, prefix };
+}
 
 export default function HeroRedesigned() {
-  const [personal, setPersonal] = useState<PersonalData>(fallback);
+  const [personal, setPersonal]   = useState<PersonalData>(fallback);
+  const [stats,    setStats]      = useState<StatItem[]>(DEFAULT_STATS);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // Load personal data (name, bio, roles, techStack, etc.)
     fetch("/api/content-public?type=personal")
-      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: PersonalData) => { if (d?.name) setPersonal({ ...fallback, ...d }); })
+      .catch(() => {});
+
+    // Load stats separately from Stats tab in admin
+    fetch("/api/content-public?type=stats")
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: StatItem[]) => { if (Array.isArray(d) && d.length > 0) setStats(d); })
       .catch(() => {});
   }, []);
 
@@ -56,10 +74,14 @@ export default function HeroRedesigned() {
   const lastName  = personal.name.split(" ").slice(1).join(" ");
   const hasPhoto  = personal.profileImage && personal.profileImage !== "/profile.jpg";
 
-  // Use heroRoles from CMS if set, otherwise use defaults
-  const roles = personal.heroRoles && personal.heroRoles.length > 0
-    ? personal.heroRoles
-    : DEFAULT_ROLES;
+  // CMS-editable values with defaults
+  const roles     = personal.heroRoles?.length ? personal.heroRoles : DEFAULT_ROLES;
+  const techStack = personal.techStack?.length  ? personal.techStack  : DEFAULT_TECH;
+
+  // Floating badges — use first 3 stats from CMS
+  const badge0 = stats[0] ?? DEFAULT_STATS[0];
+  const badge1 = stats[2] ?? DEFAULT_STATS[2];
+  const badge2 = stats[1] ?? DEFAULT_STATS[1];
 
   return (
     <section
@@ -139,10 +161,10 @@ export default function HeroRedesigned() {
               />
             </AnimatedContent>
 
-            {/* Tech stack */}
+            {/* Tech stack — from CMS (Personal Info > Tech Stack) */}
             <AnimatedContent distance={16} direction="vertical" delay={0.55} duration={0.5}>
               <div className="flex flex-wrap gap-2">
-                {TECH_STACK.map((tech, i) => (
+                {techStack.map((tech, i) => (
                   <span key={tech}
                     className="px-3 py-1 text-xs font-medium rounded-full
                       bg-gray-800/80 border border-gray-700/60 text-gray-400
@@ -242,29 +264,29 @@ export default function HeroRedesigned() {
                 </div>
               </div>
 
-              {/* Floating badges */}
+              {/* Floating badges — values from Stats CMS */}
               <div className="absolute -top-4 -left-4 bg-gray-900/90 backdrop-blur-md border border-gray-700/60
                 rounded-xl px-4 py-3 shadow-xl hover:-translate-y-1 transition-transform duration-300">
                 <p className="text-2xl font-black text-blue-400">
-                  <CountUp from={0} to={200} duration={1.8} suffix="+" threshold={0.1} />
+                  {(() => { const p = parseStat(badge0.value); return <CountUp from={0} to={p.number} prefix={p.prefix} suffix={p.suffix} duration={1.8} threshold={0.1} />; })()}
                 </p>
-                <p className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap">Docs Validated</p>
+                <p className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap">{badge0.label}</p>
               </div>
 
               <div className="absolute -top-4 -right-4 bg-gray-900/90 backdrop-blur-md border border-gray-700/60
                 rounded-xl px-4 py-3 shadow-xl hover:-translate-y-1 transition-transform duration-300">
                 <p className="text-2xl font-black text-purple-400">
-                  <CountUp from={0} to={50} duration={1.8} suffix="+" delay={0.2} threshold={0.1} />
+                  {(() => { const p = parseStat(badge1.value); return <CountUp from={0} to={p.number} prefix={p.prefix} suffix={p.suffix} duration={1.8} delay={0.2} threshold={0.1} />; })()}
                 </p>
-                <p className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap">APIs Tested</p>
+                <p className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap">{badge1.label}</p>
               </div>
 
               <div className="absolute -bottom-4 -right-4 bg-gray-900/90 backdrop-blur-md border border-gray-700/60
                 rounded-xl px-4 py-3 shadow-xl hover:-translate-y-1 transition-transform duration-300">
                 <p className="text-2xl font-black text-cyan-400">
-                  <CountUp from={0} to={1000} duration={2} suffix="+" delay={0.3} threshold={0.1} />
+                  {(() => { const p = parseStat(badge2.value); return <CountUp from={0} to={p.number} prefix={p.prefix} suffix={p.suffix} duration={2} delay={0.3} threshold={0.1} />; })()}
                 </p>
-                <p className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap">Data Records</p>
+                <p className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap">{badge2.label}</p>
               </div>
 
               {/* Social links */}
@@ -292,21 +314,25 @@ export default function HeroRedesigned() {
           </AnimatedContent>
         </div>
 
-        {/* Bottom stats bar */}
+        {/* Bottom stats bar — from Stats CMS (Admin → Stats tab) */}
         <AnimatedContent distance={24} direction="vertical" delay={0.7} duration={0.6} className="mt-16 sm:mt-20">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {STATS.map((s, i) => (
-              <div key={s.label}
-                className="flex flex-col items-center gap-1 p-4 rounded-xl
-                  bg-white/[0.03] border border-white/[0.06]
-                  hover:bg-white/[0.06] hover:border-blue-500/20
-                  transition-all duration-300 text-center">
-                <span className="text-3xl font-black text-white tabular-nums">
-                  <CountUp from={0} to={s.value} suffix={s.suffix} duration={1.8} delay={i * 0.1} threshold={0.1} />
-                </span>
-                <span className="text-xs text-gray-500 font-medium">{s.label}</span>
-              </div>
-            ))}
+            {stats.map((s, i) => {
+              const { number, suffix, prefix } = parseStat(s.value);
+              return (
+                <div key={s.label}
+                  className="flex flex-col items-center gap-1 p-4 rounded-xl
+                    bg-white/[0.03] border border-white/[0.06]
+                    hover:bg-white/[0.06] hover:border-blue-500/20
+                    transition-all duration-300 text-center">
+                  {s.icon && <span className="text-lg mb-0.5">{s.icon}</span>}
+                  <span className="text-3xl font-black text-white tabular-nums">
+                    <CountUp from={0} to={number} prefix={prefix} suffix={suffix} duration={1.8} delay={i * 0.1} threshold={0.1} />
+                  </span>
+                  <span className="text-xs text-gray-500 font-medium">{s.label}</span>
+                </div>
+              );
+            })}
           </div>
         </AnimatedContent>
       </div>
