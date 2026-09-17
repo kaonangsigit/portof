@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getContent } from "@/lib/mongodb";
 import { readContent } from "@/lib/cms-loader";
 
 const ALLOWED = [
@@ -7,31 +8,29 @@ const ALLOWED = [
 ] as const;
 type AllowedPublicType = (typeof ALLOWED)[number];
 
-// ── MongoDB reader (always preferred for types managed by admin CMS) ─────────
-async function readFromMongo(type: AllowedPublicType): Promise<unknown | null> {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) return null;
-  try {
-    const { MongoClient } = await import("mongodb");
-    const client = new MongoClient(uri);
-    await client.connect();
-    try {
-      const doc = await client.db("portfolio").collection("content").findOne({ type });
-      return doc?.data ?? null;
-    } finally {
-      await client.close();
-    }
-  } catch {
-    return null;
-  }
+// ── In-memory cache (per serverless instance, 30s TTL) ───────────────────────
+// Prevents redundant DB hits when multiple components on the same page
+// all fetch the same type (e.g. "personal" is fetched by Hero, About,
+// Contact, Footer, Blog — 5 requests that previously each opened a new connection).
+interface CacheEntry { data: unknown; expiresAt: number; }
+const cache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 30_000; // 30 seconds
+
+function fromCache(key: string): unknown | null {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) { cache.delete(key); return null; }
+  return entry.data;
+}
+function toCache(key: string, data: unknown) {
+  cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL_MS });
 }
 
-// ── Local JSON file reader (fast, used only as last fallback) ────────────────
+// ── JSON file fallback ────────────────────────────────────────────────────────
 async function readFromFile(type: AllowedPublicType): Promise<unknown | null> {
   try {
     const data = await readContent(type);
-    if (data !== null && data !== undefined) return data;
-    return null;
+    return (data !== null && data !== undefined) ? data : null;
   } catch {
     return null;
   }
@@ -46,23 +45,41 @@ export async function GET(req: NextRequest) {
 
   const t = type as AllowedPublicType;
 
-  // 1️⃣ MongoDB FIRST — admin edits always take priority
-  //    This ensures CMS saves are immediately reflected in the frontend.
-  const mongoData = await readFromMongo(t);
-  if (mongoData !== null) {
-    return NextResponse.json(mongoData, {
-      headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
+  // 1️⃣ In-memory cache hit — fastest possible (sub-millisecond)
+  const cached = fromCache(t);
+  if (cached !== null) {
+    return NextResponse.json(cached, {
+      headers: {
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        "X-Cache": "HIT",
+      },
     });
   }
 
-  // 2️⃣ JSON file fallback — used on fresh deployments before any admin edit
+  // 2️⃣ MongoDB via shared connection pool (reuses existing TCP connection)
+  const mongoData = await getContent(t);
+  if (mongoData !== null) {
+    toCache(t, mongoData);
+    return NextResponse.json(mongoData, {
+      headers: {
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        "X-Cache": "MISS",
+      },
+    });
+  }
+
+  // 3️⃣ JSON file fallback (fresh deployments before first admin edit)
   const fileData = await readFromFile(t);
   if (fileData !== null) {
+    toCache(t, fileData);
     return NextResponse.json(fileData, {
-      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" },
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        "X-Cache": "FILE",
+      },
     });
   }
 
-  // 3️⃣ Empty — frontend uses its static fallback data
+  // 4️⃣ Empty — frontend uses static fallback
   return NextResponse.json([], { status: 200 });
 }
