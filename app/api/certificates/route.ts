@@ -1,179 +1,114 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readContent, writeContent } from "@/lib/cms-loader";
+import { getDb } from "@/lib/mongodb";
 import { validateSession } from "@/lib/admin-auth";
 import type { Certificate } from "@/lib/admin-auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
 import { checkRateLimit, getClientIpFromRequest, logAuditEvent, sanitizeInput, validateFileUpload } from "@/lib/security";
+import { randomUUID } from "crypto";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const UPLOAD_RATE_LIMIT = 10; // 10 uploads per 5 minutes
-const UPLOAD_WINDOW_MS = 5 * 60 * 1000;
+// ── Cloudinary upload (stores images in cloud, not local disk) ────────────────
+// Falls back to base64 data URL if Cloudinary not configured
+async function uploadImage(file: File): Promise<string> {
+  const cloudName  = process.env.CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
 
-function requireAuth(req: NextRequest): boolean {
-  const cookie = req.cookies.get("admin_session")?.value;
-  return validateSession(cookie);
-}
+  if (cloudName && uploadPreset) {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("upload_preset", uploadPreset);
+    form.append("folder", "portfolio/certificates");
 
-export async function GET(req: NextRequest) {
-  const clientIp = getClientIpFromRequest(req);
-  
-  if (!requireAuth(req)) {
-    logAuditEvent({
-      action: "certificate_list",
-      admin: "unauthorized",
-      resource: "certificates",
-      ipAddress: clientIp,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      status: "failure",
-      errorMessage: "Unauthorized access attempt",
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: "POST",
+      body: form,
     });
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!res.ok) throw new Error("Cloudinary upload failed");
+    const data = await res.json();
+    return data.secure_url as string;
   }
 
+  // Fallback: store as base64 data URL (works anywhere, but large)
+  const buffer = await file.arrayBuffer();
+  const base64  = Buffer.from(buffer).toString("base64");
+  return `data:${file.type};base64,${base64}`;
+}
+
+const MAX_FILE_SIZE  = 5 * 1024 * 1024;
+const ALLOWED_MIMES  = ["image/jpeg", "image/png", "image/webp"];
+const RATE_LIMIT     = 10;
+const RATE_WINDOW_MS = 5 * 60 * 1000;
+
+function requireAuth(req: NextRequest): boolean {
+  return validateSession(req.cookies.get("admin_session")?.value);
+}
+
+// ── GET — list all certificates (admin) ──────────────────────────────────────
+export async function GET(req: NextRequest) {
+  const ip = getClientIpFromRequest(req);
+  if (!requireAuth(req)) {
+    logAuditEvent({ action:"certificate_list", admin:"unauthorized", resource:"certificates", ipAddress:ip, userAgent:req.headers.get("user-agent")||"", status:"failure", errorMessage:"Unauthorized" });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
-    const certs = await readContent<Certificate[]>("certificates");
-    return NextResponse.json(certs);
-  } catch {
+    const db    = await getDb();
+    const certs = await db.collection("certificates").find({}).sort({ createdAt: -1 }).toArray();
+    // Remove MongoDB _id for clean response
+    return NextResponse.json(certs.map(({ _id, ...c }) => c));
+  } catch (err) {
+    console.error("[certificates GET]", err);
     return NextResponse.json([], { status: 200 });
   }
 }
 
+// ── POST — upload a new certificate ─────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const clientIp = getClientIpFromRequest(req);
-
+  const ip = getClientIpFromRequest(req);
   if (!requireAuth(req)) {
-    logAuditEvent({
-      action: "certificate_upload",
-      admin: "unauthorized",
-      resource: "certificates",
-      ipAddress: clientIp,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      status: "failure",
-      errorMessage: "Unauthorized upload attempt",
-    });
+    logAuditEvent({ action:"certificate_upload", admin:"unauthorized", resource:"certificates", ipAddress:ip, userAgent:req.headers.get("user-agent")||"", status:"failure", errorMessage:"Unauthorized" });
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Rate limiting
-  const rateLimitResult = checkRateLimit(
-    `cert_upload:${clientIp}`,
-    UPLOAD_RATE_LIMIT,
-    UPLOAD_WINDOW_MS
-  );
-
-  if (!rateLimitResult.allowed) {
-    logAuditEvent({
-      action: "certificate_upload",
-      admin: "admin",
-      resource: "certificates",
-      ipAddress: clientIp,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      status: "failure",
-      errorMessage: "Rate limit exceeded for uploads",
-    });
-    return NextResponse.json(
-      { error: "Terlalu banyak upload. Coba lagi nanti." },
-      { status: 429 }
-    );
+  const rl = checkRateLimit(`cert_upload:${ip}`, RATE_LIMIT, RATE_WINDOW_MS);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Terlalu banyak upload. Coba lagi nanti." }, { status: 429 });
   }
 
-  const form = await req.formData();
-  const file = form.get("file") as File | null;
-  const title = sanitizeInput(form.get("title") as string, 200);
-  const issuer = sanitizeInput(form.get("issuer") as string, 200);
-  const date = (form.get("date") as string) ?? new Date().toISOString().split("T")[0];
+  const form        = await req.formData();
+  const file        = form.get("file") as File | null;
+  const title       = sanitizeInput(form.get("title")       as string, 200);
+  const issuer      = sanitizeInput(form.get("issuer")      as string, 200);
+  const date        = (form.get("date")        as string) ?? new Date().toISOString().split("T")[0];
   const description = sanitizeInput((form.get("description") as string) ?? "", 500);
-  const expiryDate = (form.get("expiryDate") as string) ?? undefined;
+  const expiryDate  = (form.get("expiryDate")  as string) ?? undefined;
 
-  if (!file) {
-    return NextResponse.json({ error: "File is required" }, { status: 400 });
-  }
+  if (!file)                  return NextResponse.json({ error: "File is required" },           { status: 400 });
+  if (!title || !issuer)      return NextResponse.json({ error: "Title and issuer required" },  { status: 400 });
 
-  if (!title.trim() || !issuer.trim()) {
-    return NextResponse.json(
-      { error: "Title and issuer are required" },
-      { status: 400 }
-    );
-  }
-
-  // Validate file
-  const fileValidation = validateFileUpload(file, {
-    maxSize: MAX_FILE_SIZE,
-    allowedMimes: ALLOWED_TYPES,
-    allowedExtensions: ["jpg", "jpeg", "png", "webp"],
-  });
-
-  if (!fileValidation.valid) {
-    logAuditEvent({
-      action: "certificate_upload",
-      admin: "admin",
-      resource: "certificates",
-      ipAddress: clientIp,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      status: "failure",
-      errorMessage: fileValidation.error,
-      details: { filename: file.name, size: file.size },
-    });
-    return NextResponse.json(
-      { error: fileValidation.error },
-      { status: 400 }
-    );
-  }
+  const fv = validateFileUpload(file, { maxSize: MAX_FILE_SIZE, allowedMimes: ALLOWED_MIMES, allowedExtensions: ["jpg","jpeg","png","webp"] });
+  if (!fv.valid) return NextResponse.json({ error: fv.error }, { status: 400 });
 
   try {
-    const ext = file.name.split(".").pop();
-    const filename = `${randomUUID()}.${ext}`;
-    const certDir = path.join(process.cwd(), "public", "certificates");
-    await mkdir(certDir, { recursive: true });
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(certDir, filename), buffer);
+    const imageUrl = await uploadImage(file);
 
-    const newCert: Certificate = {
-      id: randomUUID(),
+    const cert: Certificate & { createdAt: Date } = {
+      id:          randomUUID(),
       title,
       issuer,
       date,
-      image: `/certificates/${filename}`,
+      image:       imageUrl,
       description,
       expiryDate,
+      createdAt:   new Date(),
     };
 
-    let certs: Certificate[] = [];
-    try {
-      certs = await readContent<Certificate[]>("certificates");
-    } catch {
-      /* start fresh */
-    }
-    certs.push(newCert);
-    await writeContent("certificates", certs);
+    const db = await getDb();
+    await db.collection("certificates").insertOne({ ...cert });
 
-    logAuditEvent({
-      action: "certificate_upload",
-      admin: "admin",
-      resource: "certificates",
-      ipAddress: clientIp,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      status: "success",
-      details: { certId: newCert.id, title, issuer },
-    });
+    logAuditEvent({ action:"certificate_upload", admin:"admin", resource:"certificates", ipAddress:ip, userAgent:req.headers.get("user-agent")||"", status:"success", details:{ certId: cert.id, title, issuer } });
+    return NextResponse.json(cert, { status: 201 });
 
-    return NextResponse.json(newCert, { status: 201 });
   } catch (err) {
-    logAuditEvent({
-      action: "certificate_upload",
-      admin: "admin",
-      resource: "certificates",
-      ipAddress: clientIp,
-      userAgent: req.headers.get("user-agent") || "unknown",
-      status: "failure",
-      errorMessage: err instanceof Error ? err.message : "Upload failed",
-    });
-    return NextResponse.json(
-      { error: "Upload failed" },
-      { status: 500 }
-    );
+    console.error("[certificates POST]", err);
+    logAuditEvent({ action:"certificate_upload", admin:"admin", resource:"certificates", ipAddress:ip, userAgent:req.headers.get("user-agent")||"", status:"failure", errorMessage: err instanceof Error ? err.message : "Upload failed" });
+    return NextResponse.json({ error: "Upload failed: " + (err instanceof Error ? err.message : "unknown") }, { status: 500 });
   }
 }
