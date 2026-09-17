@@ -29,7 +29,7 @@ export default function About() {
     <SectionWrapper
       id="about"
       variant="darker"
-      header={{ eyebrow: "01 / About", title: "About Me", subtitle: "QA Engineer and Backend Developer with 2+ years of professional experience building reliable software." }}
+      header={{ eyebrow: "01 / About", title: "About Me", subtitle: p.bio || "QA Engineer and Backend Developer with 2+ years of professional experience building reliable software." }}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 

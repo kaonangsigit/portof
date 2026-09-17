@@ -19,10 +19,19 @@ export default function ExperienceForm() {
   const [form, setForm] = useState(EMPTY);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetch("/api/content?type=experience").then(r => r.json()).then(d => Array.isArray(d) && setItems(d)).catch(() => {});
   }, []);
+
+  // Filter items based on search
+  const filteredItems = items.filter(i => {
+    return searchTerm === "" ||
+      i.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      i.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (i.description && i.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  });
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -78,7 +87,19 @@ export default function ExperienceForm() {
             <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Periode</label><input value={form.period} onChange={e => setForm({...form, period: e.target.value})} className={inp} placeholder="2022 - Present" /></div>
             <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Technologies</label><input value={form.technologies} onChange={e => setForm({...form, technologies: e.target.value})} className={inp} placeholder="React, Node.js, TypeScript" /></div>
           </div>
-          <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi</label><textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} className={`${inp} resize-none`} /></div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Deskripsi
+              <span className="ml-2 text-gray-400">({form.description.length}/500)</span>
+            </label>
+            <textarea 
+              value={form.description} 
+              onChange={e => setForm({...form, description: e.target.value})} 
+              rows={2} 
+              maxLength={500}
+              className={`${inp} resize-none`} 
+            />
+          </div>
           <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Achievements (satu per baris)</label><textarea value={form.achievements} onChange={e => setForm({...form, achievements: e.target.value})} rows={3} className={`${inp} resize-none`} placeholder={"Meningkatkan performa 40%\nMemimpin tim 3 developer"} /></div>
           <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={form.current} onChange={e => setForm({...form, current: e.target.checked})} className="rounded" /><span className="text-sm text-gray-700 dark:text-gray-300">Posisi saat ini</span></label>
           <div className="flex gap-3">
@@ -87,8 +108,20 @@ export default function ExperienceForm() {
           </div>
         </form>
       </div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-gray-900 dark:text-white">
+          Daftar Experience ({filteredItems.length})
+        </h3>
+        <input
+          type="text"
+          placeholder="🔍 Search experience..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-64"
+        />
+      </div>
       <div className="space-y-3">
-        {items.map(i => (
+        {filteredItems.map(i => (
           <div key={i.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-start justify-between gap-4 shadow-sm">
             <div><p className="font-medium text-sm text-gray-900 dark:text-white">{i.role} <span className="text-gray-400">@</span> {i.company}</p><p className="text-xs text-gray-500">{i.period}{i.current ? " · Sekarang" : ""}</p></div>
             <div className="flex gap-2 shrink-0">
@@ -97,6 +130,9 @@ export default function ExperienceForm() {
             </div>
           </div>
         ))}
+        {!filteredItems.length && items.length > 0 && (
+          <p className="text-sm text-gray-500 text-center py-8">Tidak ada experience yang cocok dengan pencarian</p>
+        )}
         {!items.length && <p className="text-sm text-gray-500 text-center py-8">Belum ada experience</p>}
       </div>
     </div>

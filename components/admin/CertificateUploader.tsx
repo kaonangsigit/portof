@@ -18,6 +18,7 @@ export default function CertificateUploader() {
   const [err, setErr] = useState<string | null>(null);
   const [delId, setDelId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetch("/api/certificates")
@@ -25,6 +26,14 @@ export default function CertificateUploader() {
       .then((d) => Array.isArray(d) && setCerts(d))
       .catch(() => {});
   }, []);
+
+  // Filter certificates based on search
+  const filteredCerts = certs.filter(c => {
+    return searchTerm === "" ||
+      c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.issuer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.description && c.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  });
 
   function pick(f: File) {
     setErr(null);
@@ -169,10 +178,12 @@ export default function CertificateUploader() {
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Deskripsi
+                <span className="ml-2 text-gray-400">({desc.length}/200)</span>
               </label>
               <input
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
+                maxLength={200}
                 className={inp}
                 placeholder="Opsional"
               />
@@ -196,11 +207,20 @@ export default function CertificateUploader() {
       </div>
 
       {/* Certificate list */}
-      <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-        Daftar Sertifikat ({certs.length})
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-gray-900 dark:text-white">
+          Daftar Sertifikat ({filteredCerts.length})
+        </h3>
+        <input
+          type="text"
+          placeholder="🔍 Search certificates..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-64"
+        />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {certs.map((c) => (
+        {filteredCerts.map((c) => (
           <div
             key={c.id}
             className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
@@ -245,6 +265,11 @@ export default function CertificateUploader() {
             </div>
           </div>
         ))}
+        {!filteredCerts.length && certs.length > 0 && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 col-span-full text-center py-8">
+            Tidak ada sertifikat yang cocok dengan pencarian
+          </p>
+        )}
         {!certs.length && (
           <p className="text-sm text-gray-500 dark:text-gray-400 col-span-full text-center py-8">
             Belum ada sertifikat

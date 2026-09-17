@@ -65,7 +65,7 @@ export default function GitHubSection() {
 
   return (
     <SectionWrapper id="github" variant="darker"
-      header={{ eyebrow:"08 / GitHub", title:"GitHub Activity", subtitle:"Real-time repositories, contributions, and coding statistics." }}>
+      header={{ eyebrow:"04 / GitHub", title:"GitHub Activity", subtitle:"Real-time repositories, contributions, and coding statistics." }}>
 
       <div className="space-y-10">
 

@@ -33,7 +33,7 @@ export default function Certificates() {
       id="certificates"
       variant="dark"
       header={{
-        eyebrow: "07 / Certificates",
+        eyebrow: "05 / Certificates",
         title: "Certificates",
         subtitle: "Sertifikasi dan pencapaian profesional saya.",
       }}

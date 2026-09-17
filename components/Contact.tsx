@@ -55,7 +55,7 @@ export default function Contact() {
 
   return (
     <SectionWrapper id="contact" variant="darker"
-      header={{ eyebrow: "07 / Contact", title: "Let's Work Together", subtitle: "Available for QA, backend development, and data analysis opportunities." }}>
+      header={{ eyebrow: "06 / Contact", title: "Let's Work Together", subtitle: "Available for QA, backend development, and data analysis opportunities." }}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
         {/* Info */}

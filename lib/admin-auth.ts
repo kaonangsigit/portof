@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -16,6 +17,7 @@ export interface Certificate {
   date: string;
   image: string;
   description?: string;
+  expiryDate?: string;
 }
 
 export interface Project {
@@ -42,9 +44,15 @@ export interface PersonalInfo {
   skills: string[];
 }
 
-// Hash password dengan SHA-256
-export function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
+// ✅ IMPROVED: Hash password dengan bcryptjs (secure with salt)
+export async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(12);
+  return bcrypt.hash(password, salt);
+}
+
+// ✅ IMPROVED: Verify password dengan bcryptjs
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
 }
 
 // Buat random session token 32 bytes hex

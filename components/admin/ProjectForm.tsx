@@ -11,10 +11,22 @@ export default function ProjectForm() {
   const [errs, setErrs] = useState<{ title?: string; description?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [delId, setDelId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
 
   useEffect(() => {
     fetch("/api/projects").then(r => r.json()).then(d => Array.isArray(d) && setProjects(d)).catch(() => {});
   }, []);
+
+  // Filter projects based on search and category
+  const filteredProjects = projects.filter(p => {
+    const matchesSearch = searchTerm === "" || 
+      p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.technologies.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = filterCategory === "all" || p.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   function validate() {
     const e: typeof errs = {};
@@ -73,8 +85,17 @@ export default function ProjectForm() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
-            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} className={`${inp} resize-none`} />
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Description * 
+              <span className="ml-2 text-gray-400">({form.description.length}/500)</span>
+            </label>
+            <textarea 
+              value={form.description} 
+              onChange={e => setForm({ ...form, description: e.target.value })} 
+              rows={3} 
+              maxLength={500}
+              className={`${inp} resize-none`} 
+            />
             {errs.description && <p className="text-red-500 text-xs mt-1">{errs.description}</p>}
           </div>
           <div>
@@ -102,9 +123,28 @@ export default function ProjectForm() {
         </form>
       </div>
 
-      <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Daftar Projects ({projects.length})</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-gray-900 dark:text-white">Daftar Projects ({filteredProjects.length})</h3>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="🔍 Search projects..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-48"
+          />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          >
+            <option value="all">All Categories</option>
+            {["Full Stack","Frontend","Backend","Mobile","Other"].map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+      </div>
       <div className="space-y-3">
-        {projects.map(p => (
+        {filteredProjects.map(p => (
           <div key={p.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex items-start justify-between gap-4 shadow-sm">
             <div><p className="font-medium text-sm text-gray-900 dark:text-white">{p.title}</p><p className="text-xs text-gray-500 dark:text-gray-400">{p.category} · {p.technologies.slice(0,3).join(", ")}</p></div>
             <div className="flex gap-2 shrink-0">
@@ -116,6 +156,11 @@ export default function ProjectForm() {
             </div>
           </div>
         ))}
+        {!filteredProjects.length && projects.length > 0 && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
+            Tidak ada project yang cocok dengan filter
+          </p>
+        )}
         {!projects.length && <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Belum ada project</p>}
       </div>
     </div>

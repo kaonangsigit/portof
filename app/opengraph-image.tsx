@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'Kaonang Sigit Prakoso — QA Engineer & Backend Developer';
+export const alt = 'Kaonang Sigit Prakoso — QA Engineer, Data Analys & Backend Developer';
 export const size = {
   width: 1200,
   height: 630,
@@ -29,7 +29,7 @@ export default async function Image() {
           Kaonang Sigit Prakoso
         </div>
         <div style={{ fontSize: 48, color: '#3b82f6', fontWeight: '600', marginBottom: 30, textAlign: 'center' }}>
-          QA Engineer & Backend Developer
+          QA Engineer, Data Analys & Backend Developer
         </div>
         <div
           style={{
