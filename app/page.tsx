@@ -4,7 +4,6 @@ import Experience from "@/components/Experience";
 import Education from "@/components/Education";
 import GitHubSection from "@/components/github/GitHubSection";
 import Achievements from "@/components/Achievements";
-import Stats from "@/components/Stats";
 import Testimonials from "@/components/Testimonials";
 import Blog from "@/components/Blog";
 import Contact from "@/components/Contact";
@@ -19,7 +18,6 @@ export default function Home() {
       <Navigation />
       <HeroRedesigned />
       <About />
-      <Stats />
       <Experience />
       <Education />
       <GitHubSection />
