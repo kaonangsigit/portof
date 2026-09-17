@@ -154,6 +154,7 @@ export default function PersonalInfoForm() {
         </div>
 
         <form onSubmit={save} className="space-y-4">
+          {/* Basic fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {(["name","title","subtitle","email","location","availability"] as const).map(f => (
               <div key={f}>
@@ -161,6 +162,26 @@ export default function PersonalInfoForm() {
                 <input value={form[f]} onChange={e => setForm({ ...form, [f]: e.target.value })} className={inp} />
               </div>
             ))}
+          </div>
+
+          {/* Hero rotating roles */}
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Hero — Rotating Roles
+              <span className="ml-2 text-gray-400 font-normal">(pisahkan dengan koma)</span>
+            </label>
+            <input
+              value={((form as any).heroRoles ?? []).join(", ")}
+              onChange={e => setForm({
+                ...form,
+                heroRoles: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean),
+              } as any)}
+              className={inp}
+              placeholder="QA Engineer, Backend Developer, API Tester"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Teks yang berputar di bawah nama pada Hero section.
+            </p>
           </div>
 
           {/* Social Links */}
@@ -182,8 +203,17 @@ export default function PersonalInfoForm() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
-            <textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} rows={4} className={`${inp} resize-none`} />
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Bio
+              <span className="ml-2 text-gray-400">({form.bio.length}/500)</span>
+            </label>
+            <textarea 
+              value={form.bio} 
+              onChange={e => setForm({ ...form, bio: e.target.value })} 
+              rows={4} 
+              maxLength={500}
+              className={`${inp} resize-none`} 
+            />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Skills</label>

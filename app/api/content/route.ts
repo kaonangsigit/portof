@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 import { validateSession } from "@/lib/admin-auth";
 
-const ALLOWED_TYPES = ["personal", "skills", "experience", "achievements", "testimonials", "stats"] as const;
+const ALLOWED_TYPES = [
+  "personal", "skills", "experience", "achievements",
+  "testimonials", "stats", "education",
+] as const;
 type AllowedType = (typeof ALLOWED_TYPES)[number];
 
 function requireAuth(req: NextRequest): boolean {
