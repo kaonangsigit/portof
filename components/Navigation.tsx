@@ -6,23 +6,22 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "GitHub", href: "#github" },
+  { label: "Home",         href: "#home"         },
+  { label: "About",        href: "#about"        },
+  { label: "Experience",   href: "#experience"   },
+  { label: "GitHub",       href: "#github"       },
   { label: "Certificates", href: "#certificates" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact",      href: "#contact"      },
 ];
 
 export default function Navigation() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled,   setIsScrolled]   = useState(false);
+  const [isMenuOpen,   setIsMenuOpen]   = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
-
       const sections = navLinks.map((l) => l.href.replace("#", ""));
       for (const section of [...sections].reverse()) {
         const el = document.getElementById(section);
@@ -32,7 +31,6 @@ export default function Navigation() {
         }
       }
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -54,11 +52,13 @@ export default function Navigation() {
     >
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
           <motion.a
             href="#home"
             onClick={(e) => { e.preventDefault(); handleNavClick("#home"); }}
-            className="text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity flex items-center gap-2"
+            className="text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-600
+              bg-clip-text text-transparent hover:opacity-80 transition-opacity flex items-center gap-2"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -80,12 +80,10 @@ export default function Navigation() {
             {navLinks.map((link, i) => {
               const isActive = activeSection === link.href.replace("#", "");
               return (
-                <motion.li
-                  key={link.href}
+                <motion.li key={link.href}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 + i * 0.05 }}
-                >
+                  transition={{ duration: 0.4, delay: 0.1 + i * 0.05 }}>
                   <a
                     href={link.href}
                     onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
@@ -104,12 +102,12 @@ export default function Navigation() {
             })}
           </motion.ul>
 
-          {/* GitHub Link */}
+          {/* GitHub icon */}
           <motion.a
             href="https://github.com/kaonangsigit"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-blue-400 transition-colors rounded-lg hover:bg-gray-800/50"
+            target="_blank" rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-blue-400
+              transition-colors rounded-lg hover:bg-white/5"
             title="GitHub"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -120,80 +118,61 @@ export default function Navigation() {
             </svg>
           </motion.a>
 
-          {/* Mobile menu button */}
+          {/* ── Mobile hamburger button ──────────────────────── */}
+          {/* NOTE: plain <button> + plain <svg> — no motion wrapper
+              Motion wrappers on SVG break pointer events on iOS Safari */}
           <button
-            className="md:hidden p-2 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-gray-800/50 transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            type="button"
+            className="md:hidden relative z-10 p-2 rounded-lg text-gray-400
+              hover:text-blue-400 hover:bg-white/5 transition-colors
+              focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            onClick={() => setIsMenuOpen((v) => !v)}
             aria-expanded={isMenuOpen}
-            aria-label="Toggle navigation menu"
+            aria-controls="mobile-menu"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
-            <motion.svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-              animate={isMenuOpen ? "open" : "closed"}
-            >
-              <AnimatePresence initial={false} mode="wait">
-                {isMenuOpen ? (
-                  <motion.path
-                    key="close"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                    initial={{ opacity: 0, rotate: -90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: 90 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                ) : (
-                  <motion.path
-                    key="menu"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                    initial={{ opacity: 0, rotate: 90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: -90 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                )}
-              </AnimatePresence>
-            </motion.svg>
+            {/* Two SVGs — one visible at a time via CSS */}
+            <svg
+              className={cn("h-6 w-6 transition-all duration-200", isMenuOpen ? "hidden" : "block")}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg
+              className={cn("h-6 w-6 transition-all duration-200", isMenuOpen ? "block" : "hidden")}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        {/* Mobile menu — framer-motion slide down */}
+        {/* ── Mobile menu ───────────────────────────────────── */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
+              id="mobile-menu"
               className="md:hidden border-t border-white/6 bg-[#020817]/98 backdrop-blur-md overflow-hidden"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
             >
               <ul className="py-2 space-y-1" role="list">
                 {navLinks.map((link, i) => {
                   const isActive = activeSection === link.href.replace("#", "");
                   return (
-                    <motion.li
-                      key={link.href}
-                      initial={{ opacity: 0, x: -16 }}
+                    <motion.li key={link.href}
+                      initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.25, delay: i * 0.05 }}
-                    >
+                      transition={{ duration: 0.2, delay: i * 0.04 }}>
+                      {/* Plain <a> — not motion.a — for reliable touch events */}
                       <a
                         href={link.href}
                         onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
                         className={cn(
-                          "block px-4 py-3 text-sm font-medium rounded-lg transition-all",
+                          "block px-4 py-3.5 text-sm font-medium rounded-lg transition-all",
                           isActive
                             ? "text-blue-400 bg-blue-500/15 border border-blue-500/30"
-                            : "text-gray-500 hover:text-blue-400 hover:bg-white/5"
+                            : "text-gray-400 hover:text-blue-400 hover:bg-white/5 active:bg-white/10"
                         )}
                       >
                         {link.label}
