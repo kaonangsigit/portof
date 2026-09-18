@@ -8,13 +8,12 @@ const ALLOWED = [
 ] as const;
 type AllowedPublicType = (typeof ALLOWED)[number];
 
-// ── In-memory cache (per serverless instance, 30s TTL) ───────────────────────
-// Prevents redundant DB hits when multiple components on the same page
-// all fetch the same type (e.g. "personal" is fetched by Hero, About,
-// Contact, Footer, Blog — 5 requests that previously each opened a new connection).
+// ── In-memory cache (per serverless instance, 10s TTL) ───────────────────────
+// Short TTL: balances performance vs freshness after admin edits.
+// 10s means data shows within 10 seconds of admin save — acceptable lag.
 interface CacheEntry { data: unknown; expiresAt: number; }
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 30_000; // 30 seconds
+const CACHE_TTL_MS = 10_000; // 10 seconds (was 30s — reduced so admin edits show faster)
 
 function fromCache(key: string): unknown | null {
   const entry = cache.get(key);
@@ -56,30 +55,30 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // 2️⃣ MongoDB via shared connection pool (reuses existing TCP connection)
+  // 2️⃣ MongoDB via shared connection pool
   const mongoData = await getContent(t);
   if (mongoData !== null) {
     toCache(t, mongoData);
     return NextResponse.json(mongoData, {
       headers: {
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         "X-Cache": "MISS",
       },
     });
   }
 
-  // 3️⃣ JSON file fallback (fresh deployments before first admin edit)
+  // 3️⃣ JSON file fallback
   const fileData = await readFromFile(t);
   if (fileData !== null) {
     toCache(t, fileData);
     return NextResponse.json(fileData, {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
         "X-Cache": "FILE",
       },
     });
   }
 
-  // 4️⃣ Empty — frontend uses static fallback
+  // 4️⃣ Empty
   return NextResponse.json([], { status: 200 });
 }
